@@ -2,3 +2,15 @@
 	path = rtl/std_protocol_if
 	url = https://github.com/mballance/std_protocol_if.git
 	branch = master
+[submodule "subprojects/std_protocol_if"]
+	path = subprojects/std_protocol_if
+	url = https://github.com/mballance/std_protocol_if.git
+	branch = master
+[submodule "subprojects/chisellib"]
+	path = subprojects/chisellib
+	url = https://github.com/mballance/chisellib.git
+	branch = master
+[submodule "chiselscripts"]
+	path = chiselscripts
+	url = https://github.com/mballance/chiselscripts.git
+	branch = master
