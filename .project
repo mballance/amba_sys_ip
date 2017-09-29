@@ -26,5 +26,9 @@
 			<name>AMBA_SYS_IP</name>
 			<value>$%7BPROJECT_LOC%7D</value>
 		</variable>
+		<variable>
+			<name>SV_BFMS</name>
+			<value>$%7BPROJECT_LOC%7D/ve/sv_bfms</value>
+		</variable>
 	</variableList>
 </projectDescription>

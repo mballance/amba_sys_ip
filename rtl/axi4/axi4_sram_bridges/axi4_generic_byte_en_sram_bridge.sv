@@ -19,7 +19,8 @@ module axi4_generic_byte_en_sram_bridge #(
 			axi4_if.slave							axi_if,
 			generic_sram_byte_en_if.sram_client		sram_if
 		);
-    
+   
+	parameter ADDR_WIDTH_OFF = $clog2(AXI_DATA_WIDTH/8);
 	reg[2:0] 						write_state;
 	reg[MEM_ADDR_BITS-1:4]			write_addr;
 	wire[MEM_ADDR_BITS-1:0]			write_addr_w;
@@ -99,8 +100,8 @@ module axi4_generic_byte_en_sram_bridge #(
 				2'b00: begin // Wait Address state
 					if (axi_if.AWVALID == 1'b1 && axi_if.AWREADY == 1'b1 && 
 							sram_owner_nxt != 1) begin
-						write_addr <= axi_if.AWADDR[MEM_ADDR_BITS+2:6];
-						write_offset <= axi_if.AWADDR[5:2];
+						write_addr <= axi_if.AWADDR[MEM_ADDR_BITS+ADDR_WIDTH_OFF:ADDR_WIDTH_OFF+4];
+						write_offset <= axi_if.AWADDR[ADDR_WIDTH_OFF+4-1:ADDR_WIDTH_OFF];
     					
 						write_id <= axi_if.AWID;
 						write_count <= 0;
@@ -181,8 +182,8 @@ module axi4_generic_byte_en_sram_bridge #(
 			case (read_state)
 				2'b00: begin // Wait address state
 					if (axi_if.ARVALID && axi_if.ARREADY && sram_owner_nxt != 2) begin
-						read_addr <= axi_if.ARADDR[MEM_ADDR_BITS+2:6];
-						read_offset <= axi_if.ARADDR[5:2];
+						read_addr <= axi_if.ARADDR[MEM_ADDR_BITS+ADDR_WIDTH_OFF:ADDR_WIDTH_OFF+4];
+						read_offset <= axi_if.ARADDR[ADDR_WIDTH_OFF+4-1:ADDR_WIDTH_OFF];
 						read_length <= axi_if.ARLEN;
 						read_burst <= axi_if.ARBURST;
 						read_lock <= axi_if.ARLOCK;
@@ -192,7 +193,7 @@ module axi4_generic_byte_en_sram_bridge #(
 						sram_owner_r <= 1;
 						
 						if (axi_if.ARLOCK) begin
-							exclusive_addr <= axi_if.ARADDR[MEM_ADDR_BITS+2:6];
+							exclusive_addr <= axi_if.ARADDR[MEM_ADDR_BITS+ADDR_WIDTH_OFF:ADDR_WIDTH_OFF+4];
 							exclusive_id <= axi_if.ARID;
 						end
     					

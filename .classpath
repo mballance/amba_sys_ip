@@ -4,8 +4,13 @@
 	<classpathentry kind="src" path="subprojects/chisellib/src"/>
 	<classpathentry kind="src" path="subprojects/std_protocol_if/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/chiselscripts/lib/cache/chisel3.jar"/>
-	<classpathentry kind="lib" path="/chiselscripts/lib/cache/firrtl_2.11.jar"/>
 	<classpathentry kind="con" path="org.scala-ide.sdt.launching.SCALA_CONTAINER"/>
+	<classpathentry kind="lib" path="chiselscripts/lib/cache/chisel3.jar"/>
+	<classpathentry kind="lib" path="chiselscripts/lib/cache/firrtl_2.11.jar"/>
+	<classpathentry kind="lib" path="chiselscripts/lib/cache/moultingyaml_2.11-0.4.0.jar"/>
+	<classpathentry kind="lib" path="chiselscripts/lib/cache/scopt_2.11-3.5.0.jar"/>
+	<classpathentry kind="lib" path="chiselscripts/lib/cache/snakeyaml-1.17.jar"/>
+	<classpathentry kind="lib" path="chiselscripts/lib/cache/scala-logging_2.11-3.5.0.jar"/>
+	<classpathentry kind="lib" path="chiselscripts/lib/cache/antlr4-runtime-4.5.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
