@@ -22,3 +22,7 @@
 	path = simscripts
 	url = https://github.com/mballance/simscripts.git
 	branch = master
+[submodule "subprojects/memory_primitives"]
+	path = subprojects/memory_primitives
+	url = https://github.com/mballance/memory_primitives.git
+	branch = master
