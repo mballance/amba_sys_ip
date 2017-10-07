@@ -10,6 +10,9 @@ class Axi4Sram(val p : Axi4Sram.Parameters) extends Module {
   val io = IO(new Bundle {
     val s = Flipped(new AXI4(p.axi4_p))
   });
+  
+//  io.s.tieoff()
+  
 
   val core = Module(new axi4_sram(p))
  
@@ -33,12 +36,12 @@ class Axi4Sram(val p : Axi4Sram.Parameters) extends Module {
   core.io.WLAST := io.s.wreq.WLAST
   core.io.WVALID := io.s.wreq.WVALID
   io.s.wready := core.io.WREADY
-  
+
   io.s.brsp.BID := core.io.BID
   io.s.brsp.BRESP := core.io.BRESP
   io.s.brsp.BVALID := core.io.BVALID
   core.io.BREADY := io.s.bready
-  
+
   core.io.ARADDR := io.s.arreq.ARADDR
   core.io.ARID := io.s.arreq.ARID
   core.io.ARLEN := io.s.arreq.ARLEN
@@ -51,7 +54,7 @@ class Axi4Sram(val p : Axi4Sram.Parameters) extends Module {
   core.io.ARREGION := io.s.arreq.ARREGION
   core.io.ARVALID := io.s.arreq.ARVALID
   io.s.arready := core.io.ARREADY
-  
+
   io.s.rresp.RID := core.io.RID
   io.s.rresp.RDATA := core.io.RDATA
   io.s.rresp.RRESP := core.io.RRESP
@@ -59,15 +62,6 @@ class Axi4Sram(val p : Axi4Sram.Parameters) extends Module {
   io.s.rresp.RVALID := core.io.RVALID
   core.io.RREADY := io.s.rready
  
-}
-
-
-object Axi4Sram {
-  class Parameters(
-      val MEM_ADDR_BITS : Int = 10,
-      val axi4_p : AXI4.Parameters,
-      val INIT_FILE : String = ""
-      ) { }
 }
 
   class axi4_sram(val p : Axi4Sram.Parameters) extends BlackBox(
@@ -123,9 +117,18 @@ object Axi4Sram {
 			val RVALID = Output(Bool())
 			val RREADY = Input(Bool())
     });
-  
+    
     // Required sources
     source(this, "${AMBA_SYS_IP}/axi4/axi4_sram/axi4_sram.sv")
+  }
+
+object Axi4Sram {
+  class Parameters(
+      val MEM_ADDR_BITS : Int = 10,
+      val axi4_p : AXI4.Parameters,
+      val INIT_FILE : String = ""
+      ) { }
+  
 
   }
   
