@@ -4,45 +4,60 @@ import chisel3._
 import chisel3.util._
 import std_protocol_if._
 
-class Axi4WishboneBridge(
-    val axi4_p : AXI4.Parameters,
-    val wb_p : Wishbone.Parameters) extends Module {
+class Axi4WishboneBridge(val p : Axi4WishboneBridge.Parameters) extends Module {
  
-  require(axi4_p.ADDR_WIDTH == wb_p.ADDR_WIDTH,
-      s"ADDR_WIDTH mismatch: AXI4=${axi4_p.ADDR_WIDTH} Wishbone=${wb_p.ADDR_WIDTH}")
-  require(axi4_p.DATA_WIDTH == wb_p.DATA_WIDTH,
-      s"DATA_WIDTH mismatch: AXI4=${axi4_p.DATA_WIDTH} Wishbone=${wb_p.DATA_WIDTH}")
+  require(p.axi4_p.ADDR_WIDTH == p.wb_p.ADDR_WIDTH,
+      s"ADDR_WIDTH mismatch: AXI4=${p.axi4_p.ADDR_WIDTH} Wishbone=${p.wb_p.ADDR_WIDTH}")
+  require(p.axi4_p.DATA_WIDTH == p.wb_p.DATA_WIDTH,
+      s"DATA_WIDTH mismatch: AXI4=${p.axi4_p.DATA_WIDTH} Wishbone=${p.wb_p.DATA_WIDTH}")
   
   val io = IO(new Bundle {
-    val t = Flipped(new AXI4(axi4_p))
-    val i = new Wishbone(wb_p)
+    val t = Flipped(new AXI4(p.axi4_p))
+    val i = new Wishbone(p.wb_p)
   })
  
   val sWaitReq :: sWaitWbAck :: sWaitAxiReadReady :: sWaitAxiWriteData :: sWaitAxiWriteData2 :: sSendWriteResponse :: Nil = Enum(6)
   val access_state = RegInit(sWaitReq)
 
-  val wb_adr_r = RegInit(init = UInt(0, wb_p.ADDR_WIDTH.W))
+  val wb_adr_r = RegInit(init = UInt(0, p.wb_p.ADDR_WIDTH.W))
   val wb_we_r = RegInit(init = Bool(false))
-  val wb_sel_r = RegInit(init = UInt(0, (wb_p.DATA_WIDTH/8).W))
+  val wb_sel_r = RegInit(init = UInt(0, (p.wb_p.DATA_WIDTH/8).W))
   val axi_len_r = RegInit(init = UInt(0, 8.W))
-  val axi_id_r = RegInit(init = UInt(0, axi4_p.ID_WIDTH.W))
-  val axi_dat_r_r = RegInit(init = UInt(0, axi4_p.DATA_WIDTH.W))
-  val wb_dat_w_r = RegInit(init = UInt(0, axi4_p.DATA_WIDTH.W))
+  val axi_id_r = RegInit(init = UInt(0, p.axi4_p.ID_WIDTH.W))
+  val axi_dat_r_r = RegInit(init = UInt(0, p.axi4_p.DATA_WIDTH.W))
+  val wb_dat_w_r = RegInit(init = UInt(0, p.axi4_p.DATA_WIDTH.W))
   val axi_dat_last_r = RegInit(init = Bool(false))
+  val axi_size_r = RegInit(init = UInt(0, 3.W))
  
   switch (access_state) {
   is (sWaitReq) {
     when (io.t.arreq.ARVALID && io.t.arready) {
       wb_adr_r := io.t.arreq.ARADDR
       wb_we_r := Bool(false)
-      wb_sel_r := 0xFFFF.asUInt() // all set
+     
+      when (p.little_endian === Bool(true)) {
+        wb_sel_r := ((1.asUInt() << (io.t.arreq.ARSIZE+1.asUInt())).asUInt() - 1.asUInt()) << 
+          (io.t.arreq.ARADDR(log2Ceil(p.axi4_p.DATA_WIDTH/8)-1, 0));
+      } .otherwise {
+        wb_sel_r := ((1.asUInt() << (io.t.arreq.ARSIZE+1.asUInt())).asUInt() - 1.asUInt()) << 
+          (((p.axi4_p.DATA_WIDTH/8).asUInt()-io.t.arreq.ARADDR(log2Ceil(p.axi4_p.DATA_WIDTH/8)-1, 0))-1.asUInt());
+      }
+      
       axi_len_r := io.t.arreq.ARLEN
+      axi_size_r := io.t.arreq.ARSIZE
       axi_id_r := io.t.arreq.ARID
       access_state := sWaitWbAck
     } .otherwise {
       when (io.t.awreq.AWVALID && io.t.awready) {
         wb_adr_r := io.t.awreq.AWADDR
         wb_we_r := Bool(true)
+        when (p.little_endian === Bool(true)) {
+          wb_sel_r := ((1.asUInt() << (io.t.awreq.AWSIZE+1.asUInt())).asUInt() - 1.asUInt()) << 
+            (io.t.awreq.AWADDR(log2Ceil(p.axi4_p.DATA_WIDTH/8)-1, 0));
+        } .otherwise {
+          wb_sel_r := ((1.asUInt() << (io.t.awreq.AWSIZE+1.asUInt())).asUInt() - 1.asUInt()) << 
+            (((p.axi4_p.DATA_WIDTH/8).asUInt()-io.t.awreq.AWADDR(log2Ceil(p.axi4_p.DATA_WIDTH/8)-1, 0))-1.asUInt());
+        }
         axi_id_r := io.t.awreq.AWID
         access_state := sWaitAxiWriteData
       }
@@ -89,7 +104,6 @@ class Axi4WishboneBridge(
     }
   }
   }
-
   
   // assignments first
   io.i.req.ADR := wb_adr_r
@@ -110,4 +124,12 @@ class Axi4WishboneBridge(
   
   io.t.brsp.BVALID := (access_state === sSendWriteResponse)
   io.t.brsp.BID := axi_id_r
+}
+
+object Axi4WishboneBridge {
+  class Parameters(
+    val axi4_p : AXI4.Parameters,
+    val wb_p   : Wishbone.Parameters,
+    val little_endian : Bool = Bool(true)
+    ) { }
 }
