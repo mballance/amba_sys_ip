@@ -1,24 +1,15 @@
 
-AMBA_SYS_IP_SRC_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
+AMBA_SYS_IP_MKFILES_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
+AMBA_SYS_IP_DIR := $(abspath $(AMBA_SYS_IP_MKFILES_DIR)..)
 
 ifneq (1,$(RULES))
 
-AMBA_SYS_IP_LIB := amba_sys_ip_lib.jar
-AMBA_SYS_IP_DEPS = $(STD_PROTOCOL_IF_LIB) $(CHISELLIB_JAR) $(SV_BFMS_JAR)
-AMBA_SYS_IP_LIBS = $(AMBA_SYS_IP_LIB) $(AMBA_SYS_IP_DEPS)
-AMBA_SYS_IP_SRC := \
-  $(wildcard $(AMBA_SYS_IP_SRC_DIR)/amba_sys_ip/axi4/*.scala) \
-  $(wildcard $(AMBA_SYS_IP_SRC_DIR)/amba_sys_ip/axi4/ve/*.scala)
+AMBA_SYS_IP_JAR := $(AMBA_SYS_IP_DIR)/lib/amba_sys_ip_lib.jar
+AMBA_SYS_IP_DEPS = $(STD_PROTOCOL_IF_JARS) $(CHISELLIB_JARS) $(SV_BFMS_JARS)
+AMBA_SYS_IP_JARS = $(AMBA_SYS_IP_JAR) $(AMBA_SYS_IP_DEPS)
 
 else # Rules
 
-$(AMBA_SYS_IP_LIB) : $(AMBA_SYS_IP_SRC) $(AMBA_SYS_IP_DEPS)
-	echo "Compile: $^"
-	$(Q)$(DO_CHISELC)
-	
-Axi4SramTB.v : $(AMBA_SYS_IP_LIBS)
-	echo "Generate: $^"
-	$(Q)$(DO_CHISELG) amba_sys_ip.axi4.ve.Axi4SramTBGen
 
 endif
 

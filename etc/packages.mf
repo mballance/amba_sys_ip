@@ -1,4 +1,5 @@
 
+chiselscripts@https://github.com/mballance/chiselscripts/releases/download/0.0.2/chiselscripts-0.0.2.tar.gz
 chisellib@https://github.com/mballance/chisellib.git
 memory_primitives@https://github.com/mballance/memory_primitives.git
 std_protocol_if@https://github.com/mballance/std_protocol_if.git
