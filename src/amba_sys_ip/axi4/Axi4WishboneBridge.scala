@@ -106,11 +106,18 @@ class Axi4WishboneBridge(val p : Axi4WishboneBridge.Parameters) extends Module {
   }
   
   // assignments first
+  io.i.req.TGA := 0.asUInt()
+  io.i.req.TGD_W := 0.asUInt()
+  io.i.req.TGC := 0.asUInt()
+  io.i.req.CTI := 0.asUInt()
+  io.i.req.BTE := 0.asUInt()
+  
   io.i.req.ADR := wb_adr_r
   io.i.req.WE := wb_we_r
   io.i.req.SEL := wb_sel_r
   io.i.req.CYC := (access_state === sWaitWbAck || access_state === sWaitAxiWriteData2)
   io.i.req.STB := io.i.req.CYC
+  io.t.rresp.RRESP := 0.asUInt() // TODO: should signal an error on WB error
   io.t.rresp.RDATA := axi_dat_r_r
   io.t.rresp.RVALID := (access_state === sWaitAxiReadReady)
   io.t.rresp.RLAST := (access_state === sWaitAxiReadReady)
@@ -124,6 +131,7 @@ class Axi4WishboneBridge(val p : Axi4WishboneBridge.Parameters) extends Module {
   
   io.t.brsp.BVALID := (access_state === sSendWriteResponse)
   io.t.brsp.BID := axi_id_r
+  io.t.brsp.BRESP := 0.asUInt()
 }
 
 object Axi4WishboneBridge {
