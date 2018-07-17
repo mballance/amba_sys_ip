@@ -52,8 +52,15 @@ class Axi4WishboneBridge(val p : Axi4WishboneBridge.Parameters) extends Module {
         wb_adr_r := io.t.awreq.AWADDR
         wb_we_r := Bool(true)
         when (p.little_endian === Bool(true)) {
-          wb_sel_r := ((1.asUInt() << (io.t.awreq.AWSIZE+1.asUInt())).asUInt() - 1.asUInt()) << 
-            (io.t.awreq.AWADDR(log2Ceil(p.axi4_p.DATA_WIDTH/8)-1, 0));
+          when (io.t.awreq.AWSIZE === 0.asUInt()) {
+            wb_sel_r := (0x01.asUInt() << (io.t.awreq.AWADDR(log2Ceil(p.axi4_p.DATA_WIDTH/8)-1, 0)));
+          } .elsewhen (io.t.awreq.AWSIZE === 1.asUInt()) {
+            wb_sel_r := (0x03.asUInt() << (io.t.awreq.AWADDR(log2Ceil(p.axi4_p.DATA_WIDTH/8)-1, 1)));
+          } .elsewhen (io.t.awreq.AWSIZE === 2.asUInt()) {
+            wb_sel_r := (0x0F.asUInt() << (io.t.awreq.AWADDR(log2Ceil(p.axi4_p.DATA_WIDTH/8)-1, 2)));
+          } .otherwise {
+            wb_sel_r := 0.asUInt();
+          }          
         } .otherwise {
           wb_sel_r := ((1.asUInt() << (io.t.awreq.AWSIZE+1.asUInt())).asUInt() - 1.asUInt()) << 
             (((p.axi4_p.DATA_WIDTH/8).asUInt()-io.t.awreq.AWADDR(log2Ceil(p.axi4_p.DATA_WIDTH/8)-1, 0))-1.asUInt());
