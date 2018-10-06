@@ -21,13 +21,6 @@
 		<nature>org.scala-ide.sdt.core.scalanature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>ve/sv_bfms/qvip</name>
-			<type>2</type>
-			<locationURI>$%7BQUESTA_MVC_HOME%7D</locationURI>
-		</link>
-	</linkedResources>
 	<variableList>
 		<variable>
 			<name>AMBA_SYS_IP</name>
@@ -35,15 +28,15 @@
 		</variable>
 		<variable>
 			<name>MEMORY_PRIMITIVES</name>
-			<value>$%7BPROJECT_LOC%7D/subprojects/memory_primitives</value>
+			<value>$%7BPACKAGES_DIR%7D/memory_primitives</value>
 		</variable>
 		<variable>
 			<name>STD_PROTOCOL_IF</name>
-			<value>$%7BPROJECT_LOC%7D/subprojects/std_protocol_if</value>
+			<value>$%7BPACKAGES_DIR%7D/std_protocol_if</value>
 		</variable>
 		<variable>
 			<name>SV_BFMS</name>
-			<value>$%7BPROJECT_LOC%7D/ve/sv_bfms</value>
+			<value>$%7BPACKAGES_DIR%7D/sv_bfms</value>
 		</variable>
 	</variableList>
 </projectDescription>
