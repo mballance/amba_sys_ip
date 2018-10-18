@@ -1,3 +1,4 @@
 name=amba_sys_ip
 version=0.0.1
+rootvar=AMBA_SYS_IP
 
