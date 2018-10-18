@@ -4,6 +4,7 @@ import chisel3._
 import std_protocol_if._
 import chisellib.Plusargs
 import std_protocol_if.AXI4._
+import chisellib.arb.LockingRRArbiter
 
 class AXI4_IC(p : AXI4_IC.Parameters) extends Module {
   val N_MASTER_ID_BITS = if (p.N_MASTERS > 1) 
@@ -28,21 +29,37 @@ class AXI4_IC(p : AXI4_IC.Parameters) extends Module {
     val m = Vec(p.N_MASTERS, Flipped(new AXI4(p.axi4_p)))
     val s = Vec(p.N_SLAVES, new AXI4(targetParameters))
   })
+  
+  for (i <- 0 until p.N_MASTERS) {
+    io.s(i) <> io.m(i)
+  }
+  
+//  val ar_arb = Seq.fill(p.N_SLAVES) (Module(new LockingRRArbiter(
+//      new AXI4.ARReq(p.axi4_p),
+//      p.N_MASTERS,
+//      10000,
+//      Some((r : AXI4.ARReq) => {
+//        (
+//      }
+//  
+//  for (i <- 0 until p.N_MASTERS) {
+//    // Create an array of 
+//  }
 
   // Creates a target manager for each target device
-  val targets = Seq.fill(p.N_SLAVES) (Module(new AXI4_IC.Target(p)))
-  
-  // Connect the requests to all target managers
-  targets.foreach(t => io.m.map(_.awreq).zip(t.io.awreq).map(i => i._1 <> i._2))
-  targets.foreach(t => io.m.map(_.arreq).zip(t.io.arreq).map(i => i._1 <> i._2))
-  targets.foreach(t => io.m.map(_.wreq).zip(t.io.wreq).map(i => i._1 <> i._2))
- 
-  // Connect a target interface to each target manager
-  io.s.zip(targets.map(_.io.s)).map(ss => ss._1 <> ss._2)
-  
-  // Connect the addr base and limit to each target manager
-  io.addr_base.zip(targets).map(ss => ss._2.io.addr_base := ss._1)
-  io.addr_limit.zip(targets).map(ss => ss._2.io.addr_limit := ss._1)
+//  val targets = Seq.fill(p.N_SLAVES) (Module(new AXI4_IC.Target(p)))
+//  
+//  // Connect the requests to all target managers
+//  targets.foreach(t => io.m.map(_.awreq).zip(t.io.awreq).map(i => i._1 <> i._2))
+//  targets.foreach(t => io.m.map(_.arreq).zip(t.io.arreq).map(i => i._1 <> i._2))
+//  targets.foreach(t => io.m.map(_.wreq).zip(t.io.wreq).map(i => i._1 <> i._2))
+// 
+//  // Connect a target interface to each target manager
+//  io.s.zip(targets.map(_.io.s)).map(ss => ss._1 <> ss._2)
+//  
+//  // Connect the addr base and limit to each target manager
+//  io.addr_base.zip(targets).map(ss => ss._2.io.addr_base := ss._1)
+//  io.addr_limit.zip(targets).map(ss => ss._2.io.addr_limit := ss._1)
 }
 
 object AXI4_IC {

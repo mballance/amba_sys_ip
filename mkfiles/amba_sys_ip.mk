@@ -13,6 +13,11 @@ AMBA_SYS_IP_JARS = $(AMBA_SYS_IP_JAR) $(AMBA_SYS_IP_DEPS)
 
 else # Rules
 
+Axi4SramTB.v : $(AMBA_SYS_IP_JARS)
+	$(Q)$(DO_CHISELG) amba_sys_ip.axi4.ve.Axi4SramTBGen
+
+Axi4InterconnectTB/Axi4InterconnectTB.f : $(AMBA_SYS_IP_JARS)
+	$(Q)$(DO_CHISELG) -outdir `dirname $@` amba_sys_ip.axi4.ve.Axi4InterconnectTBGen
 
 endif
 
